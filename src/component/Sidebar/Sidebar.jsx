@@ -23,7 +23,7 @@ const Sidebar = () => {
            <p className='recent-title'>Recent</p>
            {prevPrompt.map((item,index)=>{
             return(
-              <div onClick={()=> loadPrompt(item)} className="recent-entry">
+              <div id={index} onClick={()=> loadPrompt(item)} className="recent-entry">
                 <img src={assets.message_icon} alt=''/>
                 <p>{item.slice(0,18)}...</p>
                 </div>
