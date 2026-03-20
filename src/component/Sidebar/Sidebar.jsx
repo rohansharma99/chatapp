@@ -3,52 +3,63 @@ import { useState } from 'react'
 import './Sidebar.css'
 import {assets} from '../../assets/assets'
 import { Context } from '../../context/Context'
-const Sidebar = () => {
 
-    const [extended,setExtended]=useState(false)
-    const{onSent, prevPrompt,setRecentPrompt,newChat}=useContext(Context)
-    const loadPrompt=async (prompt)=>{
-      setRecentPrompt(prompt)
-      await onSent(prompt)
+const Sidebar = () => {
+    const [extended, setExtended] = useState(false)
+    const { onSent, prevPrompt, setRecentPrompt, newChat, loadFromHistory } = useContext(Context)
+
+    const loadPrompt = (item) => {
+        loadFromHistory(item) // ✅ Koi API call nahi
     }
-  return (
-    <div className='sidebar'>
-        <div className="top">
-        <img onClick={()=>setExtended(prev=>!prev)} className='menu' src={assets.menu_icon} alt=''/>
-        <div className="new-chat" onClick={()=>newChat()}>
-            <img src={assets.plus_icon} alt=''/>
-            { extended?<p>New Chat</p>:null}
-        </div>
-        {extended? <div className="recent">
-           <p className='recent-title'>Recent</p>
-           {prevPrompt.map((item,index)=>{
-            return(
-              <div id={index} onClick={()=> loadPrompt(item)} className="recent-entry">
-                <img src={assets.message_icon} alt=''/>
-                <p>{item.slice(0,18)}...</p>
+
+    return (
+        <div className='sidebar'>
+            <div className="top">
+                <img 
+                    onClick={() => setExtended(prev => !prev)} 
+                    className='menu' 
+                    src={assets.menu_icon} 
+                    alt=''
+                />
+                <div className="new-chat" onClick={() => newChat()}>
+                    <img src={assets.plus_icon} alt=''/>
+                    {extended ? <p>New Chat</p> : null}
                 </div>
-            )
-           })}
-           
-          </div>:null
-          }
+
+                {extended ? (
+                    <div className="recent">
+                        <p className='recent-title'>Recent</p>
+                        {prevPrompt.map((item, index) => (
+                            <div 
+                                key={index} 
+                                onClick={() => loadPrompt(item)} 
+                                className="recent-entry"
+                            >
+                                <img src={assets.message_icon} alt=''/>
+                                {/* ✅ item.prompt use karo — item string nahi ab */}
+                                <p>{item.prompt.slice(0, 18)}...</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : null}
+            </div>
+
+            <div className="bottom">
+                <div className="bottom-item recent-entry">
+                    <img src={assets.question_icon} alt=''/>
+                    {extended ? <p>Help</p> : null}
+                </div>
+                <div className="bottom-item recent-entry">
+                    <img src={assets.history_icon} alt=''/>
+                    {extended ? <p>Activity</p> : null}
+                </div>
+                <div className="bottom-item recent-entry">
+                    <img src={assets.setting_icon} alt=''/>
+                    {extended ? <p>Settings</p> : null}
+                </div>
+            </div>
         </div>
-        <div className="bottom">
-            <div className="bottom-item recent-entry">
-                <img src={assets.question_icon} alt=''/>
-               {extended?<p>help</p>:null} 
-            </div>
-            <div className="bottom-item recent-entry">
-                <img src={assets.history_icon} alt=''/>
-                {extended?<p> Activity</p>:null}
-            </div>
-            <div className="bottom-item recent-entry">
-                <img src={assets.setting_icon} alt=''/>
-               {extended?<p> Settings</p>:null} 
-             </div>
-       </div>
-    </div>
-  )
+    )
 }
 
 export default Sidebar
