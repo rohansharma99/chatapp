@@ -20,7 +20,7 @@ async function main(prompt) {
     ],
   });
   
-  return response.text;
+  return response.text();
 }
 
 export default main;
