@@ -14,17 +14,16 @@ async function main(prompt) {
       {
         role: "user",
         parts: [{ text: prompt }],
-      }
+      },
     ],
   });
 
-  // Safely extract text with fallbacks
   const text =
-    response?.text?.() ??                                          // older SDK
-    response?.candidates?.[0]?.content?.parts?.[0]?.text ??       // newer SDK
+    response?.text?.() ??
+    response?.candidates?.[0]?.content?.parts?.[0]?.text ??
     "No response received.";
 
-  return String(text); // guarantee a string is always returned
+  return String(text);
 }
 
 export default main;
