@@ -7,7 +7,7 @@ export const Context = createContext();
 const ContextProvider = (props) => {
   const [input, setInput] = useState("");
   const [recentPrompt, setRecentPrompt] = useState("");
-  const [prevPrompt, setPrevPrompt] = useState([]); // ✅ objects store karega
+  const [prevPrompt, setPrevPrompt] = useState([]);
   const [showResult, setShowresult] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resultData, setResultData] = useState("");
@@ -21,8 +21,8 @@ const ContextProvider = (props) => {
   const newChat = () => {
     setLoading(false);
     setShowresult(false);
-    setResultData("");      // ✅ Clear result
-    setRecentPrompt("");    // ✅ Clear prompt
+    setResultData("");
+    setRecentPrompt("");
   };
 
   const formatResponse = (response) => {
@@ -45,34 +45,42 @@ const ContextProvider = (props) => {
 
     const currentPrompt = prompt !== undefined ? prompt : input;
 
-    // ✅ API call karo
-    const response = await main(currentPrompt);
-    const formattedResponse = formatResponse(response);
+    try {
+      const response = await main(currentPrompt);
 
-    // ✅ Prompt + Response dono save karo (sirf naye prompt ke liye)
-    if (prompt === undefined) {
-      setPrevPrompt((prev) => [
-        ...prev,
-        { prompt: input, response: formattedResponse }, // ✅ Object save karo
-      ]);
-      setRecentPrompt(input);
+      // Guarantee it's a string before formatting
+      const safeResponse =
+        typeof response === "string"
+          ? response
+          : String(response ?? "Sorry, no response received.");
+
+      const formattedResponse = formatResponse(safeResponse);
+
+      if (prompt === undefined) {
+        setPrevPrompt((prev) => [
+          ...prev,
+          { prompt: input, response: formattedResponse },
+        ]);
+        setRecentPrompt(input);
+      }
+
+      let newResponseArray = formattedResponse.split(" ");
+      for (let i = 0; i < newResponseArray.length; i++) {
+        delayPara(i, newResponseArray[i] + " ");
+      }
+    } catch (error) {
+      console.error("API error:", error);
+      setResultData("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+      setInput("");
     }
-
-    // ✅ Typing effect
-    let newResponseArray = formattedResponse.split(" ");
-    for (let i = 0; i < newResponseArray.length; i++) {
-      delayPara(i, newResponseArray[i] + " ");
-    }
-
-    setLoading(false);
-    setInput("");
   };
 
-  // ✅ History load karo — koi API call nahi!
   const loadFromHistory = (historyItem) => {
     setRecentPrompt(historyItem.prompt);
     setShowresult(true);
-    setResultData(historyItem.response); // Purana response dikhao
+    setResultData(historyItem.response);
   };
 
   const contextvalue = {
@@ -87,7 +95,7 @@ const ContextProvider = (props) => {
     input,
     setInput,
     newChat,
-    loadFromHistory, // ✅ New function export karo
+    loadFromHistory,
   };
 
   return (
