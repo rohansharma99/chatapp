@@ -18,7 +18,7 @@ async function main(prompt) {
     ],
   });
 
-  // ✅ In @google/genai v1.x, response.text is a STRING, not a function
+  // v1.x — response.text is a plain string, not a function
   const text =
     typeof response.text === "string"
       ? response.text
