@@ -18,10 +18,12 @@ async function main(prompt) {
     ],
   });
 
+  // ✅ In @google/genai v1.x, response.text is a STRING, not a function
   const text =
-    response?.text?.() ??
-    response?.candidates?.[0]?.content?.parts?.[0]?.text ??
-    "No response received.";
+    typeof response.text === "string"
+      ? response.text
+      : response?.candidates?.[0]?.content?.parts?.[0]?.text
+      ?? "No response received.";
 
   return String(text);
 }
