@@ -1,29 +1,30 @@
+import { GoogleGenAI } from "@google/genai";
+
+const GEMINI_API_KEY = "AIzaSyBTOK9VsvjtmRRw1pr6t_Ak8gmWUVysmzY";
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
 async function main(prompt) {
   if (!prompt || prompt.trim() === "") {
     return "Please enter a valid prompt.";
   }
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      messages: [
-        { role: "user", content: prompt }
-      ],
-    }),
+  const response = await ai.models.generateContent({
+    model: "gemini-2.0-flash-lite",
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: prompt }],
+      },
+    ],
   });
 
-  const data = await response.json();
+  // v1.x — response.text is a plain string, not a function
+  const text =
+    typeof response.text === "string"
+      ? response.text
+      : response?.candidates?.[0]?.content?.parts?.[0]?.text
+      ?? "No response received.";
 
-  if (!response.ok) {
-    throw new Error(JSON.stringify(data));
-  }
-
-  const text = data?.content?.[0]?.text ?? "No response received.";
   return String(text);
 }
 
